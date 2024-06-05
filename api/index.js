@@ -22,4 +22,7 @@ app.listen(PORT, (err) => {
     console.log("Server Connected to Port 3000");
   }
 });
+const roleRoutes = require("../routes/roleRoutes");
+//usage
+app.use("/roles", roleRoutes);
 dbConnection();

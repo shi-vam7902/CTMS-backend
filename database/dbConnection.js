@@ -6,7 +6,7 @@ const MONGO_URI = process.env.MONGO_URI;
 
 const dbConnection = () => {
   mongoose
-    .connect(MONGO_URI)
+    .connect("mongodb+srv://root:root@ctmsbackend.euczt3j.mongodb.net/backend")
     .then((success) => {
       console.log("Database Connection Established");
     })
