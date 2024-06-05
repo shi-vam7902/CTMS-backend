@@ -1,4 +1,4 @@
-Sure, here's the updated README file with the database connection folder included in the folder structure:
+Sure, here's the updated README file with the deployment information for Render.com:
 
 ---
 
@@ -98,8 +98,7 @@ Feel free to use a different port if port 3000 is already in use, but it's recom
 
 ### Authentication and Authorization
 
-- **User Authentication**: Implement JWT (JSON Web Tokens) for secure login and session management.
-- **Social Media Login**: Support login via Google.
+- **User Authentication**: Implement authentication and authorization using Firebase Authentication.
 - **User Roles**: Define roles (admin, member) with different access levels.
 
 ### Project and Task Management
@@ -148,7 +147,7 @@ Feel free to use a different port if port 3000 is already in use, but it's recom
 - Node.js
 - Express.js
 - MongoDB or MySQL
-- JWT for authentication
+- Firebase Authentication for authentication and authorization
 - Nodemailer for email notifications
 
 ---
@@ -162,6 +161,18 @@ Document the API endpoints, request/response formats, and authentication mechani
 ## 🗄️ Database
 
 Ensure to share the database link or the database file with stored data.
+
+---
+
+## 🌐 Deployment
+
+The backend of the Collaborative Task Management System will be deployed on [Render.com](https://render.com). 
+
+To deploy on Render.com:
+1. Log in to your Render account.
+2. Create a new Web Service.
+3. Connect the repository and configure the build and start commands.
+4. Set up the environment variables as needed.
 
 ---
 
