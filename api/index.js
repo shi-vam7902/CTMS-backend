@@ -9,7 +9,7 @@ app.use(express.json()); // for parsing application/json
 app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 app.use(
   cors({
-    origin: ["*"],
+    // origin: ["*"],
     // origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
@@ -23,6 +23,10 @@ app.listen(PORT, (err) => {
   }
 });
 const roleRoutes = require("../routes/roleRoutes");
+const statusRoutes = require("../routes/statusRoutes");
+const userRoutes = require("../routes/userRoutes");
 //usage
 app.use("/roles", roleRoutes);
+app.use("/status", statusRoutes);
+app.use("/api", userRoutes);
 dbConnection();

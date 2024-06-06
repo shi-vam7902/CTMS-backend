@@ -1,16 +1,16 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const validRoles = ["Admin", "User", "Employee"];
-const roleSchema = new Schema(
+
+const statusSchema = new Schema(
   {
-    roleName: {
+    statusName: {
       type: String,
       unique: true,
       required: true,
       lowercase: true,
       trim: true,
     },
-    roleDesc: {
+    statusDesc: {
       type: String,
     },
     createdAt: {
@@ -34,4 +34,5 @@ const roleSchema = new Schema(
     timestamps: true,
   }
 );
-module.exports = mongoose.model("role", roleSchema);
+
+module.exports = mongoose.model("status", statusSchema);

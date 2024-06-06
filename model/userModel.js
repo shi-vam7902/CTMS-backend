@@ -1,18 +1,52 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 const Schema = mongoose.Schema;
-const validRoles = ["Admin", "User", "Employee"];
-const roleSchema = new Schema(
+const userSchema = new Schema(
   {
-    roleName: {
+    firstName: {
       type: String,
-      unique: true,
+      required: true,
+      trim: true,
+    },
+    lastName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    email: {
+      type: String,
       required: true,
       lowercase: true,
       trim: true,
     },
-    roleDesc: {
+    password: {
       type: String,
+      required: true,
     },
+    role: [
+      {
+        type: String,
+        required: true,
+      },
+    ],
+    // projectId: [
+    //   {
+    //     type: Schema.Types.ObjectId,
+    //     ref: "project",
+    //   },
+    // ],
+    // taskId: [
+    //   {
+    //     type: Schema.Types.ObjectId,
+    //     ref: "task",
+    //   },
+    // ],
+    statusId: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "status",
+      },
+    ],
     createdAt: {
       type: String,
       default: function () {
@@ -34,4 +68,5 @@ const roleSchema = new Schema(
     timestamps: true,
   }
 );
-module.exports = mongoose.model("role", roleSchema);
+
+module.exports = mongoose.model("user", userSchema);
