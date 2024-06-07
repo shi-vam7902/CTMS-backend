@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "module": "commanjs",
     "start": "nodemon api/index.js",
-    "build": "npm build"
+    "build": "npm run build"
   },
   "keywords": [],
   "author": "Shivam Shah-> Task-backend",
