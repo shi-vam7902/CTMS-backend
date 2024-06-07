@@ -9,6 +9,7 @@ const roleSchema = new Schema(
       required: true,
       lowercase: true,
       trim: true,
+     
     },
     roleDesc: {
       type: String,
