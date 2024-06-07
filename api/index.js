@@ -10,14 +10,7 @@ dotenv.config();
 app.use(express.json()); // for parsing application/json
 app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 app.use(cookieParser());
-app.use(
-  cors({
-    // origin: ["*"],
-    // origin: "*",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-  })
-);
+app.use(cors());
 app.listen(PORT, (err) => {
   if (err) {
     console.log("Error Connecting to Server", err);

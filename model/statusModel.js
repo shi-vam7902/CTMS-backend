@@ -9,6 +9,7 @@ const statusSchema = new Schema(
       required: true,
       lowercase: true,
       trim: true,
+      default: "pending",
     },
     statusDesc: {
       type: String,

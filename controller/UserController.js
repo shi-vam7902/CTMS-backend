@@ -1,14 +1,14 @@
 const User = require("../model/userModel");
-const {uploadOnCloudinary}=require('../util/cloudinary');
+const { uploadOnCloudinary } = require("../util/cloudinary");
 // console.log("Debug - 2.2 -> User Controller Called");
 
 exports.signup = async (req, res, next) => {
   try {
     const { username, email, password } = req.body;
 
-    const userExists=await User.findOne({ email: email})
-    if(userExists) {
-      res.status(400).json({message: "User with this email already exists"})
+    const userExists = await User.findOne({ email: email });
+    if (userExists) {
+      res.status(400).json({ message: "User with this email already exists" });
     }
 
     const newUser = await User.create({
@@ -127,12 +127,12 @@ exports.updateUser = async (req, res, next) => {
     const { username, email, password } = req.body;
 
     let profilePictureUrl;
-    console.log("req.file",req.file);
+    console.log("req.file", req.file);
     if (req.file) {
       const profilePictureLocalPath = req.file.path;
       profilePictureUrl = await uploadOnCloudinary(profilePictureLocalPath);
       if (!profilePictureUrl) {
-        res.status(400).json({message: "Error uploading profile picture"})
+        res.status(400).json({ message: "Error uploading profile picture" });
       }
     }
 
@@ -153,12 +153,12 @@ exports.updateUser = async (req, res, next) => {
     ).select("-password");
 
     if (!updatedUser) {
-      res.status(500).json({message:"Failed to update user"})
+      res.status(500).json({ message: "Failed to update user" });
     }
 
     return res
       .status(200)
-      .json({ user: updatedUser,message: "User updated successfully" });
+      .json({ user: updatedUser, message: "User updated successfully" });
   } catch (error) {
     next(error);
   }
@@ -167,8 +167,8 @@ exports.updateUser = async (req, res, next) => {
 exports.getUsers = async (req, res, next) => {
   try {
     // Check if the requesting user is an admin
-    if (req.user.role!=="admin") {
-      res.status(403).json({message:"You are not allowed to see all users"});
+    if (req.user.role !== "admin") {
+      res.status(403).json({ message: "You are not allowed to see all users" });
     }
 
     const startIndex = parseInt(req.query.startIndex) || 0;
@@ -194,14 +194,18 @@ exports.getUsers = async (req, res, next) => {
 
     res
       .status(200)
-      .json({ users, totalUsers, lastMonthUsers,message:"User data retrieved successfully" });
-   
+      .json({
+        users,
+        totalUsers,
+        lastMonthUsers,
+        message: "User data retrieved successfully",
+      });
   } catch (error) {
     next(error);
   }
 };
 
- exports.getUser = async (req, res, next) => {
+exports.getUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.userId).select("-password");
     if (!user) {
@@ -219,18 +223,51 @@ exports.deleteUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.userId);
     if (!user) {
-      res.status(404).json({message:"user not found"});
+      res.status(404).json({ message: "user not found" });
     }
 
     // Check if the requester is an admin
-    if (!req.user.role==="admin") {
+    if (!req.user.role === "admin") {
       throw new ApiError(403, "You are not allowed to delete this user");
     }
 
-    const deletedUser=await User.findByIdAndDelete(req.params.userId);
+    const deletedUser = await User.findByIdAndDelete(req.params.userId);
 
-    res.status(200).json({user:deletedUser,message: "User deleted successfully"});
+    res
+      .status(200)
+      .json({ user: deletedUser, message: "User deleted successfully" });
   } catch (error) {
     next(error);
   }
+};
+exports.getUserTasks = async (req, res, next) => {
+  const userId = req.params.userId;
+
+  Task.find({ assignedTo: userId })
+    .populate("project", "projectName")
+    .populate("reportTo", "username")
+    .populate("taskStatus", "statusName") // assuming you have a taskStatus schema with statusName
+    .exec()
+    .then((tasks) => {
+      if (!tasks || tasks.length === 0) {
+        return res
+          .status(404)
+          .json({ message: "No tasks found for this user" });
+      }
+
+      const taskDetails = tasks.map((task) => ({
+        taskName: task.taskName,
+        taskDesc: task.taskDesc,
+        project: task.project.projectName,
+        reportTo: task.reportTo.username,
+        taskStatus: task.taskStatus.statusName,
+        taskStartDate: task.taskStartDate,
+        taskDueDate: task.taskDueDate,
+      }));
+      
+      res
+        .status(200)
+        .json({ tasks: taskDetails, message: "Tasks retrieved successfully" });
+    })
+    .catch((error) => next(error));
 };

@@ -139,3 +139,37 @@ exports.getTaskById = async (req, res) => {
     });
 };
 // console.log("Debug Console -- 4.6 Get Task By Id Called")
+exports.updateTaskStatus = async (req, res) => {
+  try {
+    const taskId = req.params.taskId;
+
+    // Assuming req.body contains the new status
+    const newStatus = req.body.status;
+
+    // Check if the new status is 'complete'
+    if (newStatus === "complete") {
+      const updatedTask = await Task.findByIdAndUpdate(
+        taskId,
+        { taskStatus: newStatus },
+        { new: true }
+      );
+
+      if (!updatedTask) {
+        return res.status(404).json({ message: "Task not found" });
+      }
+
+      return res.status(200).json({
+        message: "Task status updated successfully",
+        task: updatedTask,
+      });
+    } else {
+      return res.status(400).json({
+        message: "Invalid status. Only 'complete' status can be set.",
+      });
+    }
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Error updating task status", error: error.message });
+  }
+};
