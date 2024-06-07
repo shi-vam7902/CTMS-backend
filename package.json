@@ -8,8 +8,8 @@
     "module": "commanjs",
     "start": "node index.js",
     "dev": " api/nodemon index.js",
-    "build": "echo \"No build step defined\"",
-    "prestart": "npm run build",
+    "build": "npm run build",
+   
     "lint": "eslint .",
     "postinstall": "npm run build"
   },
