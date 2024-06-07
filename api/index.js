@@ -22,7 +22,7 @@ app.listen(PORT, (err) => {
   if (err) {
     console.log("Error Connecting to Server", err);
   } else {
-    console.log("Server Connected to Port 3000");
+    console.log("Server Connected to", `${PORT}`);
   }
 });
 const roleRoutes = require("../routes/roleRoutes");
