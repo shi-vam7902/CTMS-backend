@@ -54,18 +54,18 @@ const projectSchema = new Schema({
   user: [
     {
       type: Schema.Types.ObjectId,
-      ref: "user",
+      ref: "User",
     },
   ],
   tasks: [
     {
       type: Schema.Types.ObjectId,
-      ref: "task",
+      ref: "Task",
     },
   ],
   status: {
     type: Schema.Types.ObjectId,
-    ref: "status",
+    ref: "Status",
   },
   projectDueDate: {
     type: String,

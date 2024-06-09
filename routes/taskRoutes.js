@@ -10,7 +10,8 @@ router.put(
   validate(taskValidation),
   taskController.updateTaskById
 );
-router.get("/task/:id", taskController.getTaskById);
+// router.get("/task/:id", taskController.getTaskById);
+router.get("/task/:projectId", taskController.getTaskByProjectId);
 router.delete("/task/:id", taskController.deleteTaskById);
 router.put("/tasks/:taskId/updateStatus", taskController.updateTaskStatus);
 module.exports = router;

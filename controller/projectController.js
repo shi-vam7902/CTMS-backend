@@ -1,6 +1,7 @@
 const projectModel = require("../model/projectModel");
 const userModel = require("../model/userModel");
 const { sendNewProjectEmail } = require("../util/emailService");
+const mongoose = require("mongoose");
 // console.log("Debug - 3.1 -> project Controller Called");
 
 const getUsersByIds = (userIds) => {
@@ -148,4 +149,43 @@ exports.getProjectById = async (req, res) => {
       });
       console.log("Error in getting Project", err);
     });
+};
+
+exports.getUserProject = async (req, res) => {
+  try {
+    const aggregation = await projectModel.aggregate([
+      {
+        $lookup: {
+          from: "status",
+          localField: "status",
+          foreignField: "_id",
+          as: "statusInfo",
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user",
+          foreignField: "_id",
+          as: "userInfo",
+        },
+      },
+      {
+        $project: {
+          projectName: 1,
+          projectDesc: 1,
+          status: { $arrayElemAt: ["$statusInfo.statusName", 0] },
+          user: { $arrayElemAt: ["$userInfo.username", 0] },
+          projectStartDate: 1,
+          projectEndDate: 1,
+          projectDueDate: 1,
+        },
+      },
+    ]);
+
+    res.status(200).json(aggregation);
+  } catch (error) {
+    console.error("Error fetching user projects:", error);
+    res.status(500).json({ error: "Error fetching user projects" });
+  }
 };

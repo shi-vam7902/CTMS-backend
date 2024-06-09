@@ -65,5 +65,26 @@ exports.updateTaskStatus = async (req, res) => {};
 // console.log("Debug updateTaskStatusDone");
 exports.deleteTaskStatus = async (req, res) => {};
 // console.log("Debug deleteTaskStatusDone");
-exports.getTaskStatusById = async (req, res) => {};
+exports.getTaskStatusById = async (req, res) => {
+  const id = req.params.id;
+  console.log("id", id);
+  await taskStatusModel
+    .findById({ _id: id })
+    .then((data) => {
+      res.json({
+        message: "Task Status",
+        data: data,
+        status: 200,
+      });
+      console.log("tasks Status", data);
+    })
+    .catch((err) => {
+      res.json({
+        message: "Error in getting Task Status",
+        error: err,
+        status: 500,
+      });
+      console.log("Error");
+    });
+};
 // console.log("Debug getTaskStatusByIdDone");

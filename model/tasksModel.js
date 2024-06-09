@@ -42,8 +42,10 @@ const taskModel = new Schema({
     ref: "project",
   },
   taskStatus: {
-    type: Schema.Types.ObjectId,
-    ref: "taskstatus",
+    type: String,
+    lowercase: true,
+    trim: true,
+    default: "pending",
   },
   taskDueDate: {
     type: String,

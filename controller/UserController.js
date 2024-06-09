@@ -1,5 +1,7 @@
 const User = require("../model/userModel");
+const taskModel = require("../model/tasksModel");
 const { uploadOnCloudinary } = require("../util/cloudinary");
+const mongoose = require("mongoose");
 // console.log("Debug - 2.2 -> User Controller Called");
 
 exports.signup = async (req, res, next) => {
@@ -192,14 +194,12 @@ exports.getUsers = async (req, res, next) => {
       createdAt: { $gte: oneMonthAgo },
     });
 
-    res
-      .status(200)
-      .json({
-        users,
-        totalUsers,
-        lastMonthUsers,
-        message: "User data retrieved successfully",
-      });
+    res.status(200).json({
+      users,
+      totalUsers,
+      lastMonthUsers,
+      message: "User data retrieved successfully",
+    });
   } catch (error) {
     next(error);
   }
@@ -240,34 +240,60 @@ exports.deleteUser = async (req, res, next) => {
     next(error);
   }
 };
+
 exports.getUserTasks = async (req, res, next) => {
-  const userId = req.params.userId;
-
-  Task.find({ assignedTo: userId })
-    .populate("project", "projectName")
-    .populate("reportTo", "username")
-    .populate("taskStatus", "statusName") // assuming you have a taskStatus schema with statusName
-    .exec()
-    .then((tasks) => {
-      if (!tasks || tasks.length === 0) {
-        return res
-          .status(404)
-          .json({ message: "No tasks found for this user" });
-      }
-
-      const taskDetails = tasks.map((task) => ({
-        taskName: task.taskName,
-        taskDesc: task.taskDesc,
-        project: task.project.projectName,
-        reportTo: task.reportTo.username,
-        taskStatus: task.taskStatus.statusName,
-        taskStartDate: task.taskStartDate,
-        taskDueDate: task.taskDueDate,
-      }));
+  try {
+    const userId = req.params.userId;
+    const aggregation = await taskModel.aggregate([
+      {
+        $match: { assignedTo: new mongoose.Types.ObjectId(userId) },
+      },
+      {
+        $lookup: {
+          from: "projects",
+          localField: "project",
+          foreignField: "_id",
+          as: "projectInfo",
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "reportTo",
+          foreignField: "_id",
+          as: "reportToInfo",
+        },
+      },
       
-      res
-        .status(200)
-        .json({ tasks: taskDetails, message: "Tasks retrieved successfully" });
-    })
-    .catch((error) => next(error));
+      {
+        $lookup: {
+          from: "users",
+          localField: "assignedTo",
+          foreignField: "_id",
+          as: "assignedToInfo",
+        },
+      },
+      {
+        $project: {
+          taskName: 1,
+          taskDesc: 1,
+          project: { $arrayElemAt: ["$projectInfo.projectName", 0] },
+          assignedTo: { $arrayElemAt: ["$assignedToInfo.username", 0] },
+          reportTo: { $arrayElemAt: ["$reportToInfo.username", 0] },
+          taskStatus: 1,
+          taskStartDate: 1,
+          taskDueDate: 1,
+        },
+      },
+    ]);
+
+    res
+      .status(200)
+      .json({
+        data: aggregation,
+        message: "Successfully retrieved user tasks",
+      });
+  } catch (error) {
+    next(error);
+  }
 };

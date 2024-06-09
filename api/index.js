@@ -10,12 +10,19 @@ dotenv.config();
 app.use(express.json()); // for parsing application/json
 app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 app.use(cookieParser());
-app.use(cors());
+app.use(
+  cors({
+    // origin: ["*"],
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
 app.listen(PORT, (err) => {
   if (err) {
     console.log("Error Connecting to Server", err);
   } else {
-    console.log("Server Connected to", `${PORT}`);
+    console.log("Server Connected to Port:",PORT);
   }
 });
 const roleRoutes = require("../routes/roleRoutes");

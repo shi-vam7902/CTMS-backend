@@ -9,7 +9,6 @@ const statusSchema = new Schema(
       required: true,
       lowercase: true,
       trim: true,
-      default: "pending",
     },
     statusDesc: {
       type: String,
@@ -36,4 +35,4 @@ const statusSchema = new Schema(
   }
 );
 
-module.exports = mongoose.model("status", statusSchema);
+module.exports = mongoose.model("Status", statusSchema);

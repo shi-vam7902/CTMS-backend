@@ -20,9 +20,7 @@ const taskValidation = zod.object({
       zod.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid user ID")
     ),
     project: zod.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid project ID"),
-    taskStatus: zod
-      .string()
-      .regex(/^[0-9a-fA-F]{24}$/, "Invalid task status ID"),
+  
   }),
 });
 

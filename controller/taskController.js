@@ -1,4 +1,6 @@
 const taskModel = require("../model/tasksModel");
+const projectModel = require("../model/projectModel");
+const mongoose = require("mongoose");
 const userModel = require("../model/userModel");
 const { sendNewTaskNotification } = require("../util/emailService");
 const getUsersByTaskStatusId = (taskStatusId) => {
@@ -139,37 +141,74 @@ exports.getTaskById = async (req, res) => {
     });
 };
 // console.log("Debug Console -- 4.6 Get Task By Id Called")
+
 exports.updateTaskStatus = async (req, res) => {
   try {
     const taskId = req.params.taskId;
+    const { taskStatus } = req.body;
 
-    // Assuming req.body contains the new status
-    const newStatus = req.body.status;
+    const updateStatus = await taskModel.findByIdAndUpdate(
+      taskId,
+      { taskStatus },
+      { new: true }
+    );
 
-    // Check if the new status is 'complete'
-    if (newStatus === "complete") {
-      const updatedTask = await Task.findByIdAndUpdate(
-        taskId,
-        { taskStatus: newStatus },
-        { new: true }
-      );
-
-      if (!updatedTask) {
-        return res.status(404).json({ message: "Task not found" });
-      }
-
-      return res.status(200).json({
-        message: "Task status updated successfully",
-        task: updatedTask,
-      });
-    } else {
-      return res.status(400).json({
-        message: "Invalid status. Only 'complete' status can be set.",
-      });
+    if (!updateStatus) {
+      return res.status(500).json({ message: "Task updation failed" });
     }
+    res
+      .status(200)
+      .json({ data: updateStatus, message: "Task status updated" });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: "Error updating task status", error: error.message });
+    res.status(500).json({ message: "Task status update failed" });
+  }
+};
+
+exports.getTaskByProjectId = async (req, res) => {
+  try {
+    const pid = req.params.projectId;
+
+    const aggregation = await taskModel.aggregate([
+      {
+        $match: { project: new mongoose.Types.ObjectId(pid) },
+      },
+
+      {
+        $lookup: {
+          from: "users",
+          localField: "assignedTo",
+          foreignField: "_id",
+          as: "assignedToInfo",
+        },
+      },
+
+      {
+        $lookup: {
+          from: "users",
+          localField: "reportTo",
+          foreignField: "_id",
+          as: "reportToInfo",
+        },
+      },
+      {
+        $project: {
+          taskName: 1,
+          taskDesc: 1,
+          assignedTo: { $arrayElemAt: ["$assignedToInfo.username", 0] },
+          reportTo: { $arrayElemAt: ["$reportToInfo.username", 0] },
+          taskStatus: 1,
+          taskStartDate: 1,
+          taskDueDate: 1,
+        },
+      },
+    ]);
+
+    res.status(200).json({
+      data: aggregation,
+      message: "Successfully retrieved tasks by project Id",
+    });
+  } catch (error) {
+    console.error("Error fetching tasks by project ID:", error);
+    res.status(500).json({ error: "Error fetching tasks by project ID" });
   }
 };
